@@ -1,4 +1,4 @@
-package az.smarttravel.smart_travel_planner
+package az.smarttravel.com
 
 import io.flutter.embedding.android.FlutterActivity
 
