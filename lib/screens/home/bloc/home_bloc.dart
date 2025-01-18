@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-
-import '../models/destination.dart';
+import '../../../models/destination_model.dart';
+import 'package:geolocator/geolocator.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
@@ -14,20 +14,44 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<_SelectDestination>(_onSelectDestination);
   }
 
+  Future<Position> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      throw Exception('Location services are disabled.');
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        throw Exception('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      throw Exception('Location permissions are permanently denied');
+    }
+
+    return await Geolocator.getCurrentPosition();
+  }
+
   Future<void> _onSearchDestinations(
       _SearchDestinations event,
       Emitter<HomeState> emit,
       ) async {
     emit(const HomeState.loading());
     try {
-      // TODO: Implement actual API call
-      final destinations = await Future.delayed(
-        const Duration(seconds: 1),
-            () => Destination.sampleDestinations.where(
-              (d) => d.name.toLowerCase().contains(event.query.toLowerCase()),
-        ).toList(),
+      final position = await _getCurrentLocation();
+      final destinations = await Destination.fetchNearbyPlacesWithRetry(
+        position.latitude,
+        position.longitude,
+        radius: 5000,
       );
-      emit(HomeState.searchResults(destinations));
+      final filteredDestinations = destinations
+          .where((d) => d.name.toLowerCase().contains(event.query.toLowerCase()))
+          .toList();
+
+      emit(HomeState.searchResults(filteredDestinations));
     } catch (e) {
       emit(HomeState.error(e.toString()));
     }
@@ -39,14 +63,19 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       ) async {
     emit(const HomeState.loading());
     try {
-      // TODO: Implement actual API call
-      final destinations = await Future.delayed(
-        const Duration(seconds: 1),
-            () => Destination.sampleDestinations,
+      final position = await _getCurrentLocation();
+      final destinations = await Destination.fetchNearbyPlacesWithRetry(
+        position.latitude,
+        position.longitude,
+        radius: 5000,
       );
-      emit(HomeState.loaded(destinations));
+      destinations.sort((a, b) => b.rating.compareTo(a.rating));
+      final popularDestinations = destinations.take(5).toList();
+
+      emit(HomeState.loaded(popularDestinations));
     } catch (e) {
-      emit(HomeState.error(e.toString()));
+      final sampleDestinations = Destination.sampleDestinations;
+      emit(HomeState.loaded(sampleDestinations));
     }
   }
 
