@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
 import '../screens/home/home_page.dart';
 import '../screens/itinerary/itinerary_page.dart';
 import '../screens/place_details/place_details_page.dart';
@@ -32,12 +32,22 @@ class AppRouter {
       GoRoute(
         path: RoutePaths.home,
         name: RouteNames.home,
-        builder: (context, state) =>  HomePage(),
+        builder: (context, state) => const HomePage(),
         routes: [
           GoRoute(
             path: 'trip-planner',
             name: RouteNames.tripPlanner,
-            builder: (context, state) =>  TripPlannerPage(),
+            builder: (context, state) {
+              List<LatLng>? selectedDestinations;
+              try {
+                selectedDestinations = (state.extra as List?)?.cast<LatLng>();
+              } catch (e) {
+                selectedDestinations = [];
+              }
+              return TripPlannerPage(
+                selectedDestinations: selectedDestinations ?? [],
+              );
+            },
           ),
           GoRoute(
             path: 'place/:placeId',
@@ -56,8 +66,6 @@ class AppRouter {
       ),
     ],
 
-
-
     observers: [RouteObserver()],
 
     redirect: (context, state) {
@@ -69,8 +77,11 @@ class AppRouter {
     context.goNamed(RouteNames.home);
   }
 
-  static void goToTripPlanner(BuildContext context) {
-    context.goNamed(RouteNames.tripPlanner);
+  static void goToTripPlanner(BuildContext context, {List<LatLng>? selectedDestinations}) {
+    context.goNamed(
+      RouteNames.tripPlanner,
+      extra: selectedDestinations,
+    );
   }
 
   static void goToPlaceDetails(BuildContext context, String placeId) {
@@ -84,8 +95,11 @@ class AppRouter {
     context.goNamed(RouteNames.itinerary);
   }
 
-  static void pushTripPlanner(BuildContext context) {
-    context.pushNamed(RouteNames.tripPlanner);
+  static void pushTripPlanner(BuildContext context, {List<LatLng>? selectedDestinations}) {
+    context.pushNamed(
+      RouteNames.tripPlanner,
+      extra: selectedDestinations,
+    );
   }
 
   static void pushPlaceDetails(BuildContext context, String placeId) {

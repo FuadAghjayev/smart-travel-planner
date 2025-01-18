@@ -27,7 +27,7 @@ class Destination {
       id: '1',
       name: 'Maiden Tower',
       description: 'Historic tower in the Old City of Baku',
-      imageUrl: 'https://example.com/maiden-tower.jpg',
+      imageUrl: '',
       latitude: 40.3657,
       longitude: 49.8372,
       rating: 4.8,
@@ -49,7 +49,7 @@ class Destination {
       imageUrl: 'https://via.placeholder.com/150',
       latitude: elementLat,
       longitude: elementLon,
-      rating: 4.0,
+      rating: 4.2,
       distance: '${_calculateDistance(userLat, userLon, elementLat, elementLon).toStringAsFixed(1)} km',
     );
   }

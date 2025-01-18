@@ -5,11 +5,17 @@ import 'package:latlong2/latlong.dart';
 class MapIntegration extends StatelessWidget {
   final MapController mapController;
   final Function(LatLng) onLocationSelected;
+  final List<LatLng> selectedLocations;
+  final bool showCircle;
+  final bool showPolyline;
 
   const MapIntegration({
     super.key,
     required this.mapController,
     required this.onLocationSelected,
+    this.selectedLocations = const [],
+    this.showCircle = true,
+    this.showPolyline = true,
   });
 
   @override
@@ -51,42 +57,73 @@ class MapIntegration extends StatelessWidget {
                 size: 40,
               ),
             ),
+            ...selectedLocations.asMap().entries.map((entry) {
+              final index = entry.key;
+              final location = entry.value;
+              return Marker(
+                point: location,
+                width: 110,
+                height: 80,
+                child: CustomMarker(
+                  label: 'Stop ${index + 1}',
+                  color: _getMarkerColor(index),
+                ),
+              );
+            }).toList(),
           ],
         ),
-        // İsteğe bağlı: Polyline katmanı (rotalar için)
-        PolylineLayer(
-          polylines: [
-            // Örnek polyline - rota çizimi için
-            Polyline(
-              points: const [
-                LatLng(40.409264, 49.867092),
-                LatLng(40.419264, 49.877092),
-              ],
-              color: Colors.blue,
-              strokeWidth: 3.0,
-            ),
-          ],
-        ),
-        // İsteğe bağlı: Circle katmanı (belirli bir alanı vurgulamak için)
-        CircleLayer(
-          circles: [
-            // Örnek circle - belirli bir alanı vurgulamak için
-            CircleMarker(
-              point: const LatLng(40.409264, 49.867092),
-              radius: 1000, // metre cinsinden yarıçap
-              useRadiusInMeter: true,
-              color: Colors.blue.withOpacity(0.2),
-              borderColor: Colors.blue,
-              borderStrokeWidth: 2,
-            ),
-          ],
-        ),
+
+        if (showPolyline && selectedLocations.isNotEmpty)
+          PolylineLayer(
+            polylines: [
+              Polyline(
+                points: [
+                  const LatLng(40.409264, 49.867092),
+                  ...selectedLocations,
+                ],
+                color: Colors.blue,
+                strokeWidth: 3.0,
+              ),
+            ],
+          ),
+        if (showCircle)
+          CircleLayer(
+            circles: [
+              CircleMarker(
+                point: const LatLng(40.409264, 49.867092),
+                radius: 1000,
+                useRadiusInMeter: true,
+                color: Colors.blue.withOpacity(0.2),
+                borderColor: Colors.blue,
+                borderStrokeWidth: 2,
+              ),
+              ...selectedLocations.map((location) => CircleMarker(
+                point: location,
+                radius: 500,
+                useRadiusInMeter: true,
+                color: Colors.green.withOpacity(0.1),
+                borderColor: Colors.green,
+                borderStrokeWidth: 1,
+              )),
+            ],
+          ),
       ],
     );
   }
+
+  Color _getMarkerColor(int index) {
+    final colors = [
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+      Colors.purple,
+      Colors.teal,
+      Colors.pink,
+    ];
+    return colors[index % colors.length];
+  }
 }
 
-// İsteğe bağlı: Özel marker widget'ı
 class CustomMarker extends StatelessWidget {
   final String label;
   final Color color;

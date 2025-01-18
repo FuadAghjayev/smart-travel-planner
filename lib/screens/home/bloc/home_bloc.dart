@@ -67,7 +67,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final destinations = await Destination.fetchNearbyPlacesWithRetry(
         position.latitude,
         position.longitude,
-        radius: 3000,
+        radius: 5000,
       );
       destinations.sort((a, b) => b.rating.compareTo(a.rating));
       final popularDestinations = destinations.take(5).toList();
