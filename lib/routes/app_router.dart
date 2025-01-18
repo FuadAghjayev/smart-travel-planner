@@ -49,14 +49,14 @@ class AppRouter {
               );
             },
           ),
-          GoRoute(
-            path: 'place/:placeId',
-            name: RouteNames.placeDetails,
-            builder: (context, state) {
-              final placeId = state.pathParameters['placeId']!;
-              return PlaceDetailsPage(placeId: placeId);
-            },
-          ),
+          // GoRoute(
+          //   path: 'place/:placeId',
+          //   name: RouteNames.placeDetails,
+          //   builder: (context, state) {
+          //     final placeId = state.pathParameters['placeId']!;
+          //     return PlaceDetailsPage(place: placeId);
+          //   },
+          // ),
           GoRoute(
             path: 'itinerary',
             name: RouteNames.itinerary,

@@ -354,6 +354,8 @@ abstract class _$$SelectDestinationImplCopyWith<$Res> {
       __$$SelectDestinationImplCopyWithImpl<$Res>;
   @useResult
   $Res call({Destination destination});
+
+  $DestinationCopyWith<$Res> get destination;
 }
 
 /// @nodoc
@@ -377,6 +379,16 @@ class __$$SelectDestinationImplCopyWithImpl<$Res>
           : destination // ignore: cast_nullable_to_non_nullable
               as Destination,
     ));
+  }
+
+  /// Create a copy of HomeEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $DestinationCopyWith<$Res> get destination {
+    return $DestinationCopyWith<$Res>(_value.destination, (value) {
+      return _then(_value.copyWith(destination: value));
+    });
   }
 }
 
@@ -1223,6 +1235,8 @@ abstract class _$$DestinationSelectedImplCopyWith<$Res> {
       __$$DestinationSelectedImplCopyWithImpl<$Res>;
   @useResult
   $Res call({List<Destination> destinations, Destination selectedDestination});
+
+  $DestinationCopyWith<$Res> get selectedDestination;
 }
 
 /// @nodoc
@@ -1251,6 +1265,16 @@ class __$$DestinationSelectedImplCopyWithImpl<$Res>
           : selectedDestination // ignore: cast_nullable_to_non_nullable
               as Destination,
     ));
+  }
+
+  /// Create a copy of HomeState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $DestinationCopyWith<$Res> get selectedDestination {
+    return $DestinationCopyWith<$Res>(_value.selectedDestination, (value) {
+      return _then(_value.copyWith(selectedDestination: value));
+    });
   }
 }
 
