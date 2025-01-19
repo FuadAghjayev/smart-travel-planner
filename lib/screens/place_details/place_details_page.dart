@@ -1,177 +1,182 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../models/place.dart';
+import '../trip_planer/bloc/trip_planner_bloc.dart';
+import '../trip_planer/bloc/trip_planner_event.dart';
 import 'package:latlong2/latlong.dart';
 
-class Place {
-  final String id;
-  final String name;
-  final String description;
-  final double rating;
-  final String address;
-  final String openingHours;
-  final double latitude;
-  final double longitude;
-  final String imageUrl;
-  final String distance;
-
-  Place({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.rating,
-    required this.address,
-    required this.openingHours,
-    required this.latitude,
-    required this.longitude,
-    required this.imageUrl,
-    required this.distance,
-  });
-}
 
 class PlaceDetailsPage extends StatelessWidget {
   final Place place;
-  final Function(LatLng) onAddToTrip;
 
   const PlaceDetailsPage({
     Key? key,
     required this.place,
-    required this.onAddToTrip,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
         title: Text(place.name),
-      ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'About this place',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildInfoRow(
-                            Icons.location_on,
-                            place.address,
-                          ),
-                          const SizedBox(height: 8),
-                          _buildInfoRow(
-                            Icons.access_time,
-                            place.openingHours,
-                          ),
-                          const SizedBox(height: 8),
-                          _buildInfoRow(
-                            Icons.star,
-                            '${place.rating} / 5',
-                            iconColor: Colors.amber,
-                          ),
-                          const SizedBox(height: 8),
-                          _buildInfoRow(
-                            Icons.navigation,
-                            place.distance,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_location),
+            onPressed: () {
+              context.read<TripPlannerBloc>().add(
+                TripPlannerEvent.addDestination(
+                  point: LatLng(place.latitude, place.longitude),
+                  name: place.name,
                 ),
-
-                // Description Card
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Description',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            place.description,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+              );
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${place.name} added to trip plan'),
+                  duration: const Duration(seconds: 2),
                 ),
-                const SizedBox(height: 80),
-              ],
-            ),
+              );
+            },
+            tooltip: 'Add to Trip Plan',
           ),
         ],
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SizedBox(
-          width: double.infinity,
-          child: FloatingActionButton.extended(
-            onPressed: () {
-              onAddToTrip(LatLng(place.latitude, place.longitude));
-              Navigator.pop(context);
-            },
-            label: const Row(
-              children: [
-                Icon(Icons.add),
-                SizedBox(width: 8),
-                Text('Add to Trip'),
-              ],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (place.imageUrl != null)
+              Image.network(
+                place.imageUrl!,
+                width: double.infinity,
+                height: 200,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: double.infinity,
+                    height: 200,
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.image_not_supported, size: 50),
+                  );
+                },
+              ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.category, color: Colors.blue[700]),
+                      const SizedBox(width: 8),
+                      Text(
+                        place.category,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Icon(Icons.location_on, color: Colors.blue[700]),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          place.address,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  if (place.openingHours != null) ...[
+                    Row(
+                      children: [
+                        Icon(Icons.access_time, color: Colors.blue[700]),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            place.openingHours!,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
+                  if (place.phoneNumber != null) ...[
+                    Row(
+                      children: [
+                        Icon(Icons.phone, color: Colors.blue[700]),
+                        const SizedBox(width: 8),
+                        Text(
+                          place.phoneNumber!,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  if (place.description != null) ...[
+                    const Text(
+                      'About',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      place.description!,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  if (place.features != null && place.features!.isNotEmpty) ...[
+                    const Text(
+                      'Special Features',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: place.features!.map((feature) {
+                        return Chip(
+                          label: Text(feature),
+                          backgroundColor: Colors.blue[100],
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ],
+              ),
             ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                },
+                icon: const Icon(Icons.directions),
+                label: const Text('Route Plan'),
+              ),
+            ],
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
-  }
-
-  Widget _buildInfoRow(IconData icon, String text, {Color? iconColor}) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          size: 24,
-          color: iconColor ?? Colors.grey[600],
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black87,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

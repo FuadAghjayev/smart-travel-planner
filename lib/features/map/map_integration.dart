@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:latlong2/latlong.dart';
+import '../../services/destination_services.dart';
 
-class MapIntegration extends StatelessWidget {
+class MapIntegration extends StatefulWidget {
   final MapController mapController;
   final Function(LatLng) onLocationSelected;
   final List<LatLng> selectedLocations;
@@ -19,15 +21,36 @@ class MapIntegration extends StatelessWidget {
   });
 
   @override
+  State<MapIntegration> createState() => _MapIntegrationState();
+}
+
+class _MapIntegrationState extends State<MapIntegration> {
+  LatLng? currentLocation;
+
+  String _getDistance(LatLng point1, LatLng point2) {
+    double distance = DestinationService.calculateDistance(
+      point1.latitude,
+      point1.longitude,
+      point2.latitude,
+      point2.longitude,
+    );
+
+    if (distance < 1) {
+      return '${(distance * 1000).toStringAsFixed(0)} m';
+    }
+    return '${distance.toStringAsFixed(1)} km';
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FlutterMap(
-      mapController: mapController,
+      mapController: widget.mapController,
       options: MapOptions(
         initialCenter: const LatLng(40.409264, 49.867092),
         initialZoom: 12.0,
         minZoom: 3.0,
         maxZoom: 18.0,
-        onTap: (tapPosition, point) => onLocationSelected(point),
+        onTap: (tapPosition, point) => widget.onLocationSelected(point),
       ),
       children: [
         TileLayer(
@@ -45,59 +68,110 @@ class MapIntegration extends StatelessWidget {
             );
           },
         ),
-        MarkerLayer(
-          markers: [
-            Marker(
-              point: const LatLng(40.409264, 49.867092),
-              width: 80,
-              height: 80,
-              child: const Icon(
-                Icons.location_on,
-                color: Colors.red,
-                size: 40,
+        CurrentLocationLayer(
+          followOnLocationUpdate: FollowOnLocationUpdate.always,
+          turnOnHeadingUpdate: TurnOnHeadingUpdate.never,
+          style: LocationMarkerStyle(
+            marker: const DefaultLocationMarker(
+              child: Icon(
+                Icons.navigation,
+                color: Colors.white,
               ),
             ),
-            ...selectedLocations.asMap().entries.map((entry) {
+            markerSize: const Size(40, 40),
+            markerDirection: MarkerDirection.heading,
+          ),
+        ),
+        MarkerLayer(
+          markers: [
+            if (currentLocation != null)
+              Marker(
+                point: currentLocation!,
+                width: 80,
+                height: 80,
+                child: const Icon(
+                  Icons.my_location,
+                  color: Colors.blue,
+                  size: 40,
+                ),
+              ),
+            ...widget.selectedLocations.asMap().entries.map((entry) {
               final index = entry.key;
               final location = entry.value;
+
+              String? distance;
+              if (currentLocation != null) {
+                distance = _getDistance(currentLocation!, location);
+              }
+
               return Marker(
                 point: location,
                 width: 110,
-                height: 80,
-                child: CustomMarker(
-                  label: 'Stop ${index + 1}',
-                  color: _getMarkerColor(index),
+                height: 100,
+                child: Column(
+                  children: [
+                    CustomMarker(
+                      label: 'Stop ${index + 1}',
+                      color: _getMarkerColor(index),
+                    ),
+                    if (distance != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              spreadRadius: 1,
+                              blurRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          distance,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               );
             }).toList(),
           ],
         ),
-
-        if (showPolyline && selectedLocations.isNotEmpty)
+        if (widget.showPolyline && widget.selectedLocations.isNotEmpty)
           PolylineLayer(
             polylines: [
               Polyline(
                 points: [
-                  const LatLng(40.409264, 49.867092),
-                  ...selectedLocations,
+                  if (currentLocation != null) currentLocation!,
+                  ...widget.selectedLocations,
                 ],
                 color: Colors.blue,
                 strokeWidth: 3.0,
               ),
             ],
           ),
-        if (showCircle)
+        if (widget.showCircle)
           CircleLayer(
             circles: [
-              CircleMarker(
-                point: const LatLng(40.409264, 49.867092),
-                radius: 1000,
-                useRadiusInMeter: true,
-                color: Colors.blue.withOpacity(0.2),
-                borderColor: Colors.blue,
-                borderStrokeWidth: 2,
-              ),
-              ...selectedLocations.map((location) => CircleMarker(
+              if (currentLocation != null)
+                CircleMarker(
+                  point: currentLocation!,
+                  radius: 1000,
+                  useRadiusInMeter: true,
+                  color: Colors.blue.withOpacity(0.2),
+                  borderColor: Colors.blue,
+                  borderStrokeWidth: 2,
+                ),
+              ...widget.selectedLocations.map((location) => CircleMarker(
                 point: location,
                 radius: 500,
                 useRadiusInMeter: true,

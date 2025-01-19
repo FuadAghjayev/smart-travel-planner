@@ -3,37 +3,63 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smart_travel_planner/routes/app_router.dart';
 import 'package:smart_travel_planner/screens/home/bloc/home_bloc.dart';
 import 'package:smart_travel_planner/screens/trip_planer/bloc/trip_planner_bloc.dart';
+import 'package:smart_travel_planner/screens/itinerary/bloc/itinerary_bloc.dart';
 import 'package:smart_travel_planner/services/destination_services.dart';
-
+import 'package:smart_travel_planner/constants/database/database.dart';
+import 'package:smart_travel_planner/constants/database/itinerary_repo.dart';
 
 void main() {
-  runApp(const MyApp());
+  final database = AppDatabase();
+  runApp(MyApp(database: database));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final AppDatabase database;
+
+  const MyApp({
+    super.key,
+    required this.database,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
+    final itineraryRepository = ItineraryRepository(database);
+
+    return MultiRepositoryProvider(
       providers: [
-        BlocProvider<HomeBloc>(
-          create: (context) => HomeBloc()..add(const HomeEvent.loadPopularDestinations()),
+        RepositoryProvider.value(
+          value: database,
         ),
-        BlocProvider<TripPlannerBloc>(
-          create: (context) => TripPlannerBloc(
-            destinationService: DestinationService(),
-          ),
+        RepositoryProvider.value(
+          value: itineraryRepository,
         ),
       ],
-      child: MaterialApp.router(
-        title: 'Smart Travel Planner',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<HomeBloc>(
+            create: (context) => HomeBloc()
+              ..add(const HomeEvent.loadPopularDestinations()),
+          ),
+          BlocProvider<TripPlannerBloc>(
+            create: (context) => TripPlannerBloc(
+              destinationService: DestinationService(),
+            ),
+          ),
+          BlocProvider<ItineraryBloc>(
+            create: (context) => ItineraryBloc(
+              repository: context.read<ItineraryRepository>(),
+            )..add(const ItineraryEvent.loadRequested()),
+          ),
+        ],
+        child: MaterialApp.router(
+          title: 'Smart Travel Planner',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
+          routerConfig: AppRouter.router,
         ),
-        routerConfig: AppRouter.router,
       ),
     );
   }

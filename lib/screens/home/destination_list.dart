@@ -1,38 +1,156 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../../models/destination_model.dart';
+import '../../services/destination_services.dart';
 
-class DestinationsList extends StatelessWidget {
-  final List<Destination> destinations;
+class DestinationsList extends StatefulWidget {
   final MapController mapController;
   final List<LatLng> selectedDestinations;
   final Function(LatLng) onDestinationSelected;
+  final List<Destination>? initialDestinations;
 
   const DestinationsList({
     super.key,
-    required this.destinations,
     required this.mapController,
     required this.selectedDestinations,
     required this.onDestinationSelected,
+    this.initialDestinations,
   });
 
   @override
+  State<DestinationsList> createState() => _DestinationsListState();
+}
+
+class _DestinationsListState extends State<DestinationsList> {
+  List<Destination> destinations = [];
+  bool isLoading = true;
+  String? error;
+  Position? currentPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialDestinations != null) {
+      setState(() {
+        destinations = widget.initialDestinations!;
+        isLoading = false;
+      });
+    } else {
+      _getCurrentLocationAndPlaces();
+    }
+  }
+
+  Future<void> _getCurrentLocationAndPlaces() async {
+    try {
+      setState(() {
+        isLoading = true;
+        error = null;
+      });
+
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        throw Exception('Location services are disabled.');
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          throw Exception('Location permission is denied.');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        throw Exception('Location permissions are permanently denied, we cannot request permissions.');
+      }
+
+
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      Geolocator.getPositionStream(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 10,
+        ),
+      ).listen((Position position) {
+        if (mounted && widget.initialDestinations == null) {
+          _fetchNearbyPlaces(position);
+        }
+      });
+
+      if (mounted && widget.initialDestinations == null) {
+        _fetchNearbyPlaces(position);
+      }
+
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          error = e.toString();
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchNearbyPlaces(Position position) async {
+    try {
+      setState(() {
+        currentPosition = position;
+      });
+
+      final places = await DestinationService.fetchNearbyPlaces(
+        position.latitude,
+        position.longitude,
+        1000, // 1 km radius
+      );
+
+      if (mounted) {
+        setState(() {
+          destinations = places;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          error = e.toString();
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (destinations.isEmpty) {
+      return const Center(
+        child: Text('No places found nearby'),
+      );
+    }
+
     return ListView.builder(
       scrollDirection: Axis.horizontal,
       itemCount: destinations.length,
       itemBuilder: (context, index) {
         final destination = destinations[index];
         final location = LatLng(destination.latitude, destination.longitude);
-        final isSelected = selectedDestinations.contains(location);
+        final isSelected = widget.selectedDestinations.contains(location);
 
         return Padding(
           padding: const EdgeInsets.only(right: 16.0),
           child: GestureDetector(
             onTap: () {
-              mapController.move(location, 15.0);
+              widget.mapController.move(location, 15.0);
             },
             child: Stack(
               children: [
@@ -78,11 +196,9 @@ class DestinationsList extends StatelessWidget {
                                     isSelected
                                         ? Icons.check_circle
                                         : Icons.add_circle_outline,
-                                    color: isSelected
-                                        ? Colors.blue
-                                        : Colors.grey,
+                                    color: isSelected ? Colors.blue : Colors.grey,
                                   ),
-                                  onPressed: () => onDestinationSelected(location),
+                                  onPressed: () => widget.onDestinationSelected(location),
                                 ),
                               ],
                             ),
@@ -147,7 +263,7 @@ class DestinationsList extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        'Stop ${selectedDestinations.indexOf(location) + 1}',
+                        'Stop ${widget.selectedDestinations.indexOf(location) + 1}',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,

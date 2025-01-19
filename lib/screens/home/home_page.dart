@@ -264,13 +264,13 @@ class HomeView extends StatelessWidget {
                             ),
                             orElse: () => const SizedBox(),
                             loaded: (destinations) => DestinationsList(
-                              destinations: destinations,
+                              initialDestinations: destinations,
                               mapController: mapController,
                               selectedDestinations: selectedDestinations,
                               onDestinationSelected: onDestinationSelected,
                             ),
                             searchResults: (destinations) => DestinationsList(
-                              destinations: destinations,
+                              initialDestinations: destinations,
                               mapController: mapController,
                               selectedDestinations: selectedDestinations,
                               onDestinationSelected: onDestinationSelected,
@@ -286,25 +286,22 @@ class HomeView extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 5),
-        child: FloatingActionButton.extended(
-          onPressed: () {
-            if (selectedDestinations.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Please select at least one destination')),
-              );
-              return;
-            }
-            context.go('/trip-planner', extra: selectedDestinations);
-          },
-          label: Text(
-            selectedDestinations.isEmpty ? 'Select Destinations' : 'Plan Trip (${selectedDestinations.length})',
-            style: const TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.redAccent,
-          elevation: 4,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          if (selectedDestinations.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Please select at least one destination')),
+            );
+            return;
+          }
+          context.go('/trip-planner', extra: selectedDestinations);
+        },
+        label: Text(
+          selectedDestinations.isEmpty ? 'Select Destinations' : 'Plan Trip (${selectedDestinations.length})',
+          style: const TextStyle(color: Colors.white),
         ),
+        backgroundColor: Colors.redAccent,
+        elevation: 4,
       ),
     );
   }
