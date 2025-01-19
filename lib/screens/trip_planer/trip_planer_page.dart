@@ -3,7 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
-import '../../services/destionation_services.dart';
+import '../../services/destination_services.dart';
 import 'bloc/trip_planner_bloc.dart';
 import 'bloc/trip_planner_event.dart';
 import 'bloc/trip_planner_state.dart';
@@ -253,38 +253,11 @@ class _TripPlannerViewState extends State<TripPlannerView> {
                           ],
                         ),
                       ),
-                    FloatingActionButton.extended(
-                      onPressed: () {
-                        setState(() => isSelectingDestination = true);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Tap on the map to add a destination'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      },
-                      label: const Text('Add Destination'),
-                      icon: const Icon(Icons.add_location),
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                    ),
+
                   ],
                 ),
               ),
-              if (isSelectingDestination)
-                Container(
-                  color: Colors.black.withOpacity(0.3),
-                  child: const Center(
-                    child: Text(
-                      'Tap anywhere on the map',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+
             ],
           ),
         );

@@ -1,29 +1,30 @@
 import 'dart:math';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import '../services/api_service.dart';
 
-class Destination {
-  final String id;
-  final String name;
-  final String description;
-  final String imageUrl;
-  final double latitude;
-  final double longitude;
-  final double rating;
-  final String distance;
+part 'destination_model.freezed.dart';
+part 'destination_model.g.dart';
 
-  Destination({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.imageUrl,
-    required this.latitude,
-    required this.longitude,
-    required this.rating,
-    required this.distance,
-  });
+@freezed
+class Destination with _$Destination {
+  const Destination._();
+
+  const factory Destination({
+    required String id,
+    required String name,
+    required String description,
+    required String imageUrl,
+    required double latitude,
+    required double longitude,
+    required double rating,
+    required String distance,
+  }) = _Destination;
+
+  factory Destination.fromJson(Map<String, dynamic> json) =>
+      _$DestinationFromJson(json);
 
   static List<Destination> get sampleDestinations => [
-    Destination(
+    const Destination(
       id: '1',
       name: 'Maiden Tower',
       description: 'Historic tower in the Old City of Baku',
@@ -71,7 +72,11 @@ class Destination {
     return degree * pi / 180;
   }
 
-  static Future<List<Destination>> fetchNearbyPlaces(double lat, double lon, {double radius = 1000}) async {
+  static Future<List<Destination>> fetchNearbyPlaces(
+      double lat,
+      double lon, {
+        double radius = 1000,
+      }) async {
     try {
       final apiService = ApiService();
       final elements = await apiService.fetchPlaces(lat, lon, radius: radius);
@@ -80,7 +85,9 @@ class Destination {
         return sampleDestinations;
       }
 
-      return elements.map((element) => fromOSMElement(element, lat, lon)).toList();
+      return elements
+          .map((element) => fromOSMElement(element, lat, lon))
+          .toList();
     } catch (e) {
       print('Error fetching places: $e');
       return sampleDestinations;
@@ -96,16 +103,36 @@ class Destination {
     try {
       final apiService = ApiService();
       final elements = await apiService.fetchPlacesWithRetry(
-          lat,
-          lon,
-          radius: radius,
-          maxRetries: maxRetries
+        lat,
+        lon,
+        radius: radius,
+        maxRetries: maxRetries,
       );
 
-      return elements.map((element) => fromOSMElement(element, lat, lon)).toList();
+      return elements
+          .map((element) => fromOSMElement(element, lat, lon))
+          .toList();
     } catch (e) {
       print('Error fetching places with retry: $e');
       return sampleDestinations;
     }
   }
+
+  // Additional methods for TripPlanner integration
+
+  String get displayName => '$name ($distance)';
+
+  bool get hasValidCoordinates =>
+      latitude != 0.0 && longitude != 0.0;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'description': description,
+    'imageUrl': imageUrl,
+    'latitude': latitude,
+    'longitude': longitude,
+    'rating': rating,
+    'distance': distance,
+  };
 }
