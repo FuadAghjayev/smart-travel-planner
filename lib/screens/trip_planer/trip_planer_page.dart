@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import '../../common/custom_app_bar.dart';
 import '../../services/destination_services.dart';
 import 'bloc/trip_planner_bloc.dart';
 import 'bloc/trip_planner_event.dart';
@@ -60,7 +61,6 @@ class _TripPlannerViewState extends State<TripPlannerView> {
   void _initializeMap() {
     final state = context.read<TripPlannerBloc>().state;
     if (state.routePoints.isNotEmpty) {
-      // Center map on the first selected destination
       mapController.move(state.routePoints.first, 13.0);
     } else {
       _getCurrentLocation();
@@ -91,8 +91,9 @@ class _TripPlannerViewState extends State<TripPlannerView> {
     return BlocBuilder<TripPlannerBloc, TripPlannerState>(
       builder: (context, state) {
         return Scaffold(
-          appBar: AppBar(
-            title: Text('Trip Planner (${state.routePointsCount} stops)'),
+          appBar:
+          CustomAppBar(
+            title: 'Trip Planner (${state.routePointsCount} stops)',
             actions: [
               IconButton(
                 icon: const Icon(Icons.clear),

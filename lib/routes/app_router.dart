@@ -127,15 +127,15 @@ class AppRouter {
           ),
         ],
       ),
-      GoRoute(
-        path: RoutePaths.placeDetails,
-        name: RouteNames.placeDetails,
-        parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) {
-          final place = state.extra as Place;
-          return PlaceDetailsPage(place: place);
-        },
-      ),
+      // GoRoute(
+      //   path: RoutePaths.placeDetails,
+      //   name: RouteNames.placeDetails,
+      //   parentNavigatorKey: _rootNavigatorKey,
+      //   builder: (context, state) {
+      //     final place = state.extra as Place;
+      //     return PlaceDetailsPage(name: place);
+      //   },
+      // ),
     ],
     observers: [RouteObserver()],
     redirect: (context, state) {

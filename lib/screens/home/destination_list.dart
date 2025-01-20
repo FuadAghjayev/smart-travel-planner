@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 
 import '../../models/destination_model.dart';
 import '../../services/destination_services.dart';
+import '../place_details/place_details_page.dart';
 
 class DestinationsList extends StatefulWidget {
   final MapController mapController;
@@ -59,7 +60,7 @@ class _DestinationsListState extends State<DestinationsList> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          throw Exception('Location permission is denied.');
+          throw Exception('Location permissions are denied.');
         }
       }
 
@@ -67,10 +68,10 @@ class _DestinationsListState extends State<DestinationsList> {
         throw Exception('Location permissions are permanently denied, we cannot request permissions.');
       }
 
-
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
+
       Geolocator.getPositionStream(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
@@ -105,7 +106,7 @@ class _DestinationsListState extends State<DestinationsList> {
       final places = await DestinationService.fetchNearbyPlaces(
         position.latitude,
         position.longitude,
-        1000, // 1 km radius
+        1000,
       );
 
       if (mounted) {
@@ -132,9 +133,10 @@ class _DestinationsListState extends State<DestinationsList> {
       );
     }
 
+
     if (destinations.isEmpty) {
       return const Center(
-        child: Text('No places found nearby'),
+        child: Text('No places found nearby.'),
       );
     }
 
@@ -148,8 +150,23 @@ class _DestinationsListState extends State<DestinationsList> {
 
         return Padding(
           padding: const EdgeInsets.only(right: 16.0),
-          child: GestureDetector(
+          child: InkWell(
             onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PlaceDetailsPage(
+                    destination: destination,
+                    isInTrip: isSelected,
+                    onAddToTrip: () {
+                      widget.onDestinationSelected(location);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              );
+            },
+            onLongPress: () {
               widget.mapController.move(location, 15.0);
             },
             child: Stack(
