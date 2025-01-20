@@ -1,10 +1,10 @@
 import 'dart:math';
 import 'package:dio/dio.dart';
 
+import '../constants/network/network_manager.dart';
 import '../models/destination_model.dart';
 
 class DestinationService {
-  static final Dio _dio = Dio();
   static const String overpassUrl = 'https://overpass-api.de/api/interpreter';
 
   static Future<List<Destination>> fetchNearbyPlaces(
@@ -13,7 +13,7 @@ class DestinationService {
     [out:json][timeout:25];
     (    
       node["tourism"](around:${radius},${lat},${lon});
-      way["tourism"](around:${radius},${lat},${lon});import 'dart:math';
+      way["tourism"](around:${radius},${lat},${lon});
       node["amenity"="restaurant"](around:${radius},${lat},${lon});
       node["amenity"="cafe"](around:${radius},${lat},${lon});
     );
@@ -23,19 +23,18 @@ class DestinationService {
     ''';
 
     try {
-      final response = await _dio.post(
-        overpassUrl,
+      final response = await NetworkManager.instance.request<Map<String, dynamic>>(
+        url: overpassUrl,
+        method: 'POST',
         data: query,
         options: Options(
-          contentType: 'text/plain', // Overpass API expects plain text
+          contentType: 'text/plain',
           responseType: ResponseType.json,
         ),
       );
 
-      if (response.statusCode == 200) {
-        final data = response.data;
-        final elements = data['elements'] as List;
-
+      if (response != null) {
+        final elements = response['elements'] as List;
         return elements.map((element) {
           final tags = element['tags'] ?? {};
           final name = tags['name'] ?? 'Unknown Place';
@@ -51,18 +50,13 @@ class DestinationService {
             longitude: element['lon'] ?? lon,
             rating: 4.0,
             distance:
-                '${calculateDistance(lat, lon, element['lat'], element['lon']).toStringAsFixed(1)} km',
+            '${calculateDistance(lat, lon, element['lat'], element['lon']).toStringAsFixed(1)} km',
           );
         }).toList();
       }
-      throw DioException(
-        requestOptions: RequestOptions(path: overpassUrl),
-        error: 'Failed to fetch places',
-      );
-    } on DioException catch (e) {
-      throw Exception('Dio error: ${e.message}');
+      throw Exception('Failed to fetch places');
     } catch (e) {
-      throw Exception('Error: $e');
+      rethrow;
     }
   }
 

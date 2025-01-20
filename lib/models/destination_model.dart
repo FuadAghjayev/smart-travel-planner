@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../services/api_service.dart';
+import '../services/map_service.dart';
 
 part 'destination_model.freezed.dart';
 part 'destination_model.g.dart';
