@@ -38,7 +38,7 @@ class Destination with _$Destination {
 
   static Destination fromOSMElement(Map<String, dynamic> element, double userLat, double userLon) {
     final tags = element['tags'] ?? {};
-    final name = tags['name'] ?? 'Unknown Place';
+    final name = tags['name'] ?? 'Place';
     final description = tags['description'] ?? tags['tourism'] ?? 'No description';
     final elementLat = element['lat'] ?? userLat;
     final elementLon = element['lon'] ?? userLon;
@@ -47,7 +47,7 @@ class Destination with _$Destination {
       id: element['id'].toString(),
       name: name,
       description: description,
-      imageUrl: 'https://via.placeholder.com/150',
+      imageUrl: '',
       latitude: elementLat,
       longitude: elementLon,
       rating: 4.2,

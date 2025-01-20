@@ -54,6 +54,7 @@ class MyApp extends StatelessWidget {
         child: MaterialApp.router(
           title: 'Smart Travel Planner',
           debugShowCheckedModeBanner: false,
+          darkTheme: ThemeData.light(),
           theme: ThemeData(
             primarySwatch: Colors.blue,
             visualDensity: VisualDensity.adaptivePlatformDensity,

@@ -166,6 +166,7 @@ class HomeView extends StatelessWidget {
                   currentPosition: currentPosition,
                   showCircle: true,
                   showPolyline: true,
+                  nearbyPlaces: [],
                 ),
               ),
               if (selectedDestinations.isNotEmpty)

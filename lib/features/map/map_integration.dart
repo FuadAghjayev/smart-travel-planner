@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import '../../models/destination_model.dart';
 
 class MapIntegration extends StatelessWidget {
   final MapController mapController;
@@ -11,6 +12,8 @@ class MapIntegration extends StatelessWidget {
   final bool showCircle;
   final bool showPolyline;
   final List<Marker> additionalMarkers;
+  final List<Destination> nearbyPlaces;
+  final Function(Destination)? onPlaceSelected;
 
   const MapIntegration({
     Key? key,
@@ -21,6 +24,8 @@ class MapIntegration extends StatelessWidget {
     this.showCircle = true,
     this.showPolyline = true,
     this.additionalMarkers = const [],
+    this.nearbyPlaces = const [],
+    this.onPlaceSelected,
   }) : super(key: key);
 
   @override
@@ -66,6 +71,16 @@ class MapIntegration extends StatelessWidget {
                 label: '',
                 color: Colors.blue,
               ),
+            ...nearbyPlaces.map((place) => createPlaceMarker(
+              position: LatLng(place.latitude, place.longitude),
+              label: place.name,
+              icon: _getIconForPlace(place),
+              color: Colors.green,
+              onTap: () {
+                onPlaceSelected?.call(place);
+                _showPlaceDetails(context, place);
+              },
+            )),
             ...additionalMarkers,
           ],
         ),
@@ -89,10 +104,83 @@ class MapIntegration extends StatelessWidget {
     );
   }
 
-  Marker _buildLocationMarker(LatLng position, {
-    required String label,
-    required Color color,
-  }) {
+  IconData _getIconForPlace(Destination place) {
+    final description = place.description.toLowerCase();
+    if (description.contains('restaurant')) {
+      return Icons.restaurant;
+    } else if (description.contains('cafe')) {
+      return Icons.local_cafe;
+    } else if (description.contains('hotel')) {
+      return Icons.hotel;
+    } else if (description.contains('museum')) {
+      return Icons.museum;
+    }
+    return Icons.place;
+  }
+
+  void _showPlaceDetails(BuildContext context, Destination place) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    place.name.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(place.description.toUpperCase()),
+            const SizedBox(height: 8),
+            Text('Distance: ${place.distance}'),
+            Row(
+              children: [
+                const Icon(Icons.star, color: Colors.amber),
+                Text(' ${place.rating}'),
+              ],
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  onPlaceSelected?.call(place);
+                  Navigator.pop(context);
+                },
+                child: const Text('Add to Route'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Marker _buildLocationMarker(
+      LatLng position, {
+        required String label,
+        required Color color,
+      }) {
     return Marker(
       point: position,
       width: 80,

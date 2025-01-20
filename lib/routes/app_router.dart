@@ -7,7 +7,68 @@ import '../screens/itinerary/itinerary_page.dart';
 import '../screens/trip_planer/trip_planer_page.dart';
 import '../../models/place.dart';
 
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 3), () {
+      context.go(RoutePaths.home);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [
+              Colors.teal,
+              Colors.tealAccent,
+            ],
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/images/4304999.jpg',
+              height: 120,
+              width: 120,
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Travel Planner',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class RouteNames {
+  static const String splash = 'splash';
   static const String home = 'home';
   static const String tripPlanner = 'tripPlanner';
   static const String placeDetails = 'placeDetails';
@@ -15,6 +76,7 @@ class RouteNames {
 }
 
 class RoutePaths {
+  static const String splash = '/splash';
   static const String home = '/';
   static const String tripPlanner = '/trip-planner';
   static const String placeDetails = '/place/:placeId';
@@ -48,6 +110,9 @@ class _ScaffoldWithBottomBarState extends State<ScaffoldWithBottomBar> {
       body: widget.child,
       bottomNavigationBar: AdvancedSalomonBottomBar(
         currentIndex: _getCurrentIndex(widget.location),
+        itemShape: StadiumBorder(),
+        backgroundColor: Colors.black12,
+        curve: Curves.easeInOut,
         onTap: (index) {
           switch (index) {
             case 0:
@@ -86,11 +151,17 @@ class _ScaffoldWithBottomBarState extends State<ScaffoldWithBottomBar> {
 class AppRouter {
   static final GlobalKey<NavigatorState> _rootNavigatorKey =
   GlobalKey<NavigatorState>(debugLabel: 'root');
+
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: RoutePaths.home,
+    initialLocation: RoutePaths.splash,
     debugLogDiagnostics: true,
     routes: [
+      GoRoute(
+        path: RoutePaths.splash,
+        name: RouteNames.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
       ShellRoute(
         builder: (context, state, child) {
           return ScaffoldWithBottomBar(
@@ -116,6 +187,7 @@ class AppRouter {
               }
               return TripPlannerPage(
                 selectedDestinations: selectedDestinations ?? [],
+                destinations: [],
               );
             },
           ),
@@ -141,6 +213,10 @@ class AppRouter {
       return null;
     },
   );
+
+  static void goToSplash(BuildContext context) {
+    context.goNamed(RouteNames.splash);
+  }
 
   static void goToHome(BuildContext context) {
     context.goNamed(RouteNames.home);
