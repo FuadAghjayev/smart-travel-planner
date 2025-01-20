@@ -141,7 +141,6 @@ class HomeView extends StatelessWidget {
                   selectedLocations: selectedDestinations,
                 ),
               ),
-
               if (selectedDestinations.isNotEmpty)
                 Positioned(
                   top: 120,

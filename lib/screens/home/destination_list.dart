@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../models/destination_model.dart';
+import '../../routes/app_router.dart';
 import '../../services/destination_services.dart';
+import '../itinerary/bloc/itinerary_bloc.dart';
 import '../place_details/place_details_page.dart';
 
 class DestinationsList extends StatefulWidget {
@@ -289,11 +292,62 @@ class _DestinationsListState extends State<DestinationsList> {
                       ),
                     ),
                   ),
+                if (widget.selectedDestinations.isNotEmpty)
+                  Positioned(
+                    bottom: 16,
+                    right: 16,
+                    child: MaterialButton(
+                      onPressed: () => _saveToItinerary(context),
+                      color: Colors.blue,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(Icons.save, color: Colors.white),
+                          SizedBox(width: 8),
+                          Text(
+                            'Save Route',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
         );
       },
     );
+  }
+  void _saveToItinerary(BuildContext context) {
+    final now = DateTime.now();
+    for (var i = 0; i < widget.selectedDestinations.length; i++) {
+      final location = widget.selectedDestinations[i];
+      final destination = destinations.firstWhere(
+            (d) => d.latitude == location.latitude && d.longitude == location.longitude,
+      );
+
+      context.read<ItineraryBloc>().add(
+        ItineraryEvent.addRequested(
+          destination: destination.name,
+          activity: 'Visit',
+          date: now,
+          time: '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
+        ),
+      );
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Route saved to itinerary successfully!')),
+    );
+
+    AppRouter.pushItinerary(context);
   }
 }
