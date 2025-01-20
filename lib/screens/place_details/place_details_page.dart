@@ -91,7 +91,10 @@ class PlaceDetailsPage extends StatelessWidget {
                   const SizedBox(height: 24),
                   Text(
                     'About',
-                    style: Theme.of(context).textTheme.headlineSmall,
+                    style: TextStyle(
+                      color: Colors.teal,
+                      fontSize: 20,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
