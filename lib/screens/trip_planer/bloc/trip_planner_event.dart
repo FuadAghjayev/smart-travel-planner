@@ -40,4 +40,9 @@ class TripPlannerEvent with _$TripPlannerEvent {
     double? minRating,
     double? maxDistance,
   }) = FilterNearbyPlaces;
+
+  const factory TripPlannerEvent.updateCurrentLocation(
+      LatLng currentLocation,
+      ) = UpdateCurrentLocation;
+
 }

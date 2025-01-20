@@ -1,14 +1,17 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../common/custom_app_bar.dart';
-import '../../models/place.dart';
+import '../../constants/location/location_permissons.dart';
+import '../../features/map/map_integration.dart';
 import '../../services/destination_services.dart';
 import 'bloc/trip_planner_bloc.dart';
 import 'bloc/trip_planner_event.dart';
 import 'bloc/trip_planner_state.dart';
+
 
 class TripPlannerPage extends StatelessWidget {
   final List<LatLng> selectedDestinations;
@@ -43,44 +46,145 @@ class TripPlannerView extends StatefulWidget {
 class _TripPlannerViewState extends State<TripPlannerView> {
   late final MapController mapController;
   bool isSelectingDestination = false;
+  Position? currentUserPosition;
+  StreamSubscription<Position>? _positionStreamSubscription;
+  bool _isCalculatingDistance = false;
+  double? _nearestPointDistance;
+  Timer? _distanceUpdateTimer;
 
   @override
   void initState() {
     super.initState();
     mapController = MapController();
+    _setupLocationListener();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeMap();
+    });
+
+    _distanceUpdateTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      _updateDistanceCalculations();
     });
   }
 
   @override
   void dispose() {
+    _positionStreamSubscription?.cancel();
+    _distanceUpdateTimer?.cancel();
     mapController.dispose();
     super.dispose();
   }
 
-  void _initializeMap() {
+  void _setupLocationListener() async {
+    final hasPermission = await LocationPermissionHandler.handlePermission(context);
+    if (!hasPermission) return;
+
+    const locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10,
+    );
+
+    _positionStreamSubscription = Geolocator.getPositionStream(
+      locationSettings: locationSettings,
+    ).listen((Position position) {
+      setState(() {
+        currentUserPosition = position;
+      });
+
+      final currentLatLng = LatLng(position.latitude, position.longitude);
+      _loadNearbyPlaces(currentLatLng);
+      _updateDistanceCalculations();
+
+      context.read<TripPlannerBloc>().add(
+        TripPlannerEvent.updateCurrentLocation(currentLatLng),
+      );
+    });
+  }
+
+  void _updateDistanceCalculations() {
+    if (currentUserPosition == null || !mounted) return;
+
+    setState(() {
+      _isCalculatingDistance = true;
+    });
+
+    try {
+      final currentLatLng = LatLng(
+        currentUserPosition!.latitude,
+        currentUserPosition!.longitude,
+      );
+
+      final state = context.read<TripPlannerBloc>().state;
+      if (state.routePoints.isNotEmpty) {
+        final distance = _findNearestRoutePointDistance(currentLatLng, state.routePoints);
+        setState(() {
+          _nearestPointDistance = distance;
+        });
+      }
+
+      setState(() {
+        _isCalculatingDistance = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isCalculatingDistance = false;
+        _nearestPointDistance = null;
+      });
+      _showErrorSnackBar('Error calculating distance: $e');
+    }
+  }
+
+  double _findNearestRoutePointDistance(LatLng currentLocation, List<LatLng> routePoints) {
+    if (routePoints.isEmpty) return 0;
+
+    double minDistance = double.infinity;
+    for (var point in routePoints) {
+      double distance = DestinationService.calculateDistance(
+        currentLocation.latitude,
+        currentLocation.longitude,
+        point.latitude,
+        point.longitude,
+      );
+      if (distance < minDistance) {
+        minDistance = distance;
+      }
+    }
+    return minDistance;
+  }
+
+  void _initializeMap() async {
     final state = context.read<TripPlannerBloc>().state;
     if (state.routePoints.isNotEmpty) {
       mapController.move(state.routePoints.first, 13.0);
     } else {
-      _getCurrentLocation();
+      await _getCurrentLocation();
     }
   }
 
   Future<void> _getCurrentLocation() async {
+    final hasPermission = await LocationPermissionHandler.handlePermission(context);
+    if (!hasPermission) return;
+
     try {
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-      mapController.move(
-        LatLng(position.latitude, position.longitude),
-        13.0,
+
+      setState(() {
+        currentUserPosition = position;
+      });
+
+      final currentLatLng = LatLng(position.latitude, position.longitude);
+      mapController.move(currentLatLng, 13.0);
+      _updateDistanceCalculations();
+
+      context.read<TripPlannerBloc>().add(
+        TripPlannerEvent.updateCurrentLocation(currentLatLng),
       );
-      _loadNearbyPlaces(LatLng(position.latitude, position.longitude));
+
+      _loadNearbyPlaces(currentLatLng);
+
     } catch (e) {
-      debugPrint('Error getting location: $e');
-      _showErrorSnackBar('Could not get current location');
+      _showErrorSnackBar('Location error: $e');
     }
   }
 
@@ -88,19 +192,12 @@ class _TripPlannerViewState extends State<TripPlannerView> {
     context.read<TripPlannerBloc>().add(
       TripPlannerEvent.loadNearbyPlaces(
         location: location,
-        radius: 5000,
-      //  categories: ['restaurant', 'tourist_attraction', 'hotel'],
+        radius: 500,
       ),
     );
   }
 
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
-  void _onMapTap(TapPosition tapPosition, LatLng point) {
+  void _onMapTap(LatLng point) {
     if (isSelectingDestination) {
       context.read<TripPlannerBloc>().add(
         TripPlannerEvent.addDestination(point: point),
@@ -109,7 +206,28 @@ class _TripPlannerViewState extends State<TripPlannerView> {
         isSelectingDestination = false;
       });
       _loadNearbyPlaces(point);
+      _updateDistanceCalculations();
     }
+  }
+
+  void _showInfoSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   @override
@@ -118,68 +236,52 @@ class _TripPlannerViewState extends State<TripPlannerView> {
       builder: (context, state) {
         return Scaffold(
           appBar: CustomAppBar(
-            title: 'Trip Planner (${state.routePointsCount} stops)',
+            title: 'Route planner (${state.routePointsCount} points)',
+            showBackButton: false,
             actions: [
               IconButton(
                 icon: Icon(
                   isSelectingDestination ? Icons.close : Icons.add_location,
+                  color: Colors.white,
                 ),
                 onPressed: () {
                   setState(() {
                     isSelectingDestination = !isSelectingDestination;
                   });
-                  if (!isSelectingDestination) {
-                    _showInfoSnackBar('Tap on map to add destination');
+                  if (isSelectingDestination) {
+                    _showInfoSnackBar('Add destination');
                   }
                 },
+                tooltip: 'Add Destination',
               ),
               IconButton(
-                icon: const Icon(Icons.clear),
+                icon: const Icon(Icons.my_location, color: Colors.white),
+                onPressed: _getCurrentLocation,
+                tooltip: 'Go Location',
+              ),
+              IconButton(
+                icon: const Icon(Icons.clear, color: Colors.white),
                 onPressed: () {
                   context.read<TripPlannerBloc>().add(
                     const TripPlannerEvent.clearRoute(),
                   );
+                  setState(() {
+                    _nearestPointDistance = null;
+                  });
                 },
+                tooltip: 'Clear Route',
               ),
             ],
           ),
           body: Stack(
             children: [
-              FlutterMap(
+              MapIntegration(
                 mapController: mapController,
-                options: MapOptions(
-                  onTap: _onMapTap,
-                  initialCenter: const LatLng(40.409264, 49.867092),
-                  initialZoom: 13.0,
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  ),
-                  PolylineLayer(
-                    polylines: [
-                      if (state.hasRoutePoints)
-                        Polyline(
-                          points: state.routePoints,
-                          color: Colors.blue,
-                          strokeWidth: 4.0,
-                        ),
-                    ],
-                  ),
-                  // MarkerLayer(
-                  //   markers: [
-                  //     ...state.routePoints.asMap().entries.map(
-                  //           (entry) => _buildDestinationMarker(
-                  //         entry.value,
-                  //         'Stop ${entry.key + 1}',
-                  //       ),
-                  //     ),
-                  //     ...state.nearbyPlaces.map(
-                  //           (place) => _buildNearbyPlaceMarker(place),
-                  //     ),
-                  //   ],
-                  // ),
-                ],
+                onLocationSelected: _onMapTap,
+                selectedLocations: state.routePoints,
+                currentPosition: currentUserPosition,
+                showCircle: true,
+                showPolyline: true,
               ),
               if (state.isLoading)
                 const Center(
@@ -195,122 +297,9 @@ class _TripPlannerViewState extends State<TripPlannerView> {
     );
   }
 
-  Marker _buildDestinationMarker(LatLng point, String label) {
-    return Marker(
-      point: point,
-      width: 110,
-      height: 80,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 4,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.blue,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const Icon(
-            Icons.location_on,
-            color: Colors.red,
-            size: 40,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Marker _buildNearbyPlaceMarker(Place place) {
-    return Marker(
-      point: LatLng(place.latitude, place.longitude),
-      child: GestureDetector(
-        onTap: () => _showPlaceDetails(place),
-        child: Tooltip(
-          message: place.name,
-          child: Icon(
-            _getPlaceIcon(place.category),
-            color: _getPlaceColor(place.category),
-            size: 30,
-          ),
-        ),
-      ),
-    );
-  }
-
-  IconData _getPlaceIcon(String category) {
-    switch (category) {
-      case 'restaurant':
-        return Icons.restaurant;
-      case 'tourist_attraction':
-        return Icons.photo_camera;
-      case 'hotel':
-        return Icons.hotel;
-      default:
-        return Icons.place;
-    }
-  }
-
-  Color _getPlaceColor(String category) {
-    switch (category) {
-      case 'restaurant':
-        return Colors.orange;
-      case 'tourist_attraction':
-        return Colors.green;
-      case 'hotel':
-        return Colors.purple;
-      default:
-        return Colors.blue;
-    }
-  }
-
-  void _showPlaceDetails(Place place) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              place.name,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(place.description ?? 'No description available'),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                context.read<TripPlannerBloc>().add(
-                  TripPlannerEvent.addDestination(
-                   point:  LatLng(place.latitude, place.longitude),
-                  ),
-                );
-                Navigator.pop(context);
-              },
-              child: const Text('Add to Route'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildTripInfoPanel(TripPlannerState state) {
     return Positioned(
-      bottom: 16,
+      bottom: 8,
       left: 16,
       right: 16,
       child: Column(
@@ -332,13 +321,22 @@ class _TripPlannerViewState extends State<TripPlannerView> {
               child: Column(
                 children: [
                   _buildInfoRow(
-                    'Total Distance',
+                    'Total Route Distance',
                     '${state.calculateTotalDistance().toStringAsFixed(1)} km',
                   ),
+                  if (currentUserPosition != null && _nearestPointDistance != null) ...[
+                    const SizedBox(height: 8),
+                    _buildInfoRow(
+                      'Distance to Route',
+                      _isCalculatingDistance
+                          ? 'Calculating...'
+                          : '${_nearestPointDistance!.toStringAsFixed(1)} km',
+                    ),
+                  ],
                   const SizedBox(height: 8),
                   _buildInfoRow(
-                    'Destinations',
-                    '${state.routePointsCount} stops',
+                    'Route Points',
+                    '${state.routePointsCount}',
                   ),
                 ],
               ),
@@ -379,7 +377,7 @@ class _TripPlannerViewState extends State<TripPlannerView> {
         color: Colors.black54,
         padding: const EdgeInsets.all(16),
         child: const Text(
-          'Tap on the map to add a destination',
+          'New destination selected',
           style: TextStyle(
             color: Colors.white,
             fontSize: 16,
@@ -387,15 +385,6 @@ class _TripPlannerViewState extends State<TripPlannerView> {
           ),
           textAlign: TextAlign.center,
         ),
-      ),
-    );
-  }
-
-  void _showInfoSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2),
       ),
     );
   }

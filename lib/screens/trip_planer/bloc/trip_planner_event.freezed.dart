@@ -29,6 +29,7 @@ mixin _$TripPlannerEvent {
     required TResult Function(
             String? type, double? minRating, double? maxDistance)
         filterNearbyPlaces,
+    required TResult Function(LatLng currentLocation) updateCurrentLocation,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -43,6 +44,7 @@ mixin _$TripPlannerEvent {
     TResult? Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult? Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult? Function(LatLng currentLocation)? updateCurrentLocation,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -57,6 +59,7 @@ mixin _$TripPlannerEvent {
     TResult Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult Function(LatLng currentLocation)? updateCurrentLocation,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -69,6 +72,8 @@ mixin _$TripPlannerEvent {
     required TResult Function(RemoveDestination value) removeDestination,
     required TResult Function(ReorderDestinations value) reorderDestinations,
     required TResult Function(FilterNearbyPlaces value) filterNearbyPlaces,
+    required TResult Function(UpdateCurrentLocation value)
+        updateCurrentLocation,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -80,6 +85,7 @@ mixin _$TripPlannerEvent {
     TResult? Function(RemoveDestination value)? removeDestination,
     TResult? Function(ReorderDestinations value)? reorderDestinations,
     TResult? Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult? Function(UpdateCurrentLocation value)? updateCurrentLocation,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -91,6 +97,7 @@ mixin _$TripPlannerEvent {
     TResult Function(RemoveDestination value)? removeDestination,
     TResult Function(ReorderDestinations value)? reorderDestinations,
     TResult Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult Function(UpdateCurrentLocation value)? updateCurrentLocation,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -219,6 +226,7 @@ class _$LoadNearbyPlacesImpl extends LoadNearbyPlaces {
     required TResult Function(
             String? type, double? minRating, double? maxDistance)
         filterNearbyPlaces,
+    required TResult Function(LatLng currentLocation) updateCurrentLocation,
   }) {
     return loadNearbyPlaces(location, radius, maxRetries);
   }
@@ -236,6 +244,7 @@ class _$LoadNearbyPlacesImpl extends LoadNearbyPlaces {
     TResult? Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult? Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult? Function(LatLng currentLocation)? updateCurrentLocation,
   }) {
     return loadNearbyPlaces?.call(location, radius, maxRetries);
   }
@@ -253,6 +262,7 @@ class _$LoadNearbyPlacesImpl extends LoadNearbyPlaces {
     TResult Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult Function(LatLng currentLocation)? updateCurrentLocation,
     required TResult orElse(),
   }) {
     if (loadNearbyPlaces != null) {
@@ -271,6 +281,8 @@ class _$LoadNearbyPlacesImpl extends LoadNearbyPlaces {
     required TResult Function(RemoveDestination value) removeDestination,
     required TResult Function(ReorderDestinations value) reorderDestinations,
     required TResult Function(FilterNearbyPlaces value) filterNearbyPlaces,
+    required TResult Function(UpdateCurrentLocation value)
+        updateCurrentLocation,
   }) {
     return loadNearbyPlaces(this);
   }
@@ -285,6 +297,7 @@ class _$LoadNearbyPlacesImpl extends LoadNearbyPlaces {
     TResult? Function(RemoveDestination value)? removeDestination,
     TResult? Function(ReorderDestinations value)? reorderDestinations,
     TResult? Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult? Function(UpdateCurrentLocation value)? updateCurrentLocation,
   }) {
     return loadNearbyPlaces?.call(this);
   }
@@ -299,6 +312,7 @@ class _$LoadNearbyPlacesImpl extends LoadNearbyPlaces {
     TResult Function(RemoveDestination value)? removeDestination,
     TResult Function(ReorderDestinations value)? reorderDestinations,
     TResult Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult Function(UpdateCurrentLocation value)? updateCurrentLocation,
     required TResult orElse(),
   }) {
     if (loadNearbyPlaces != null) {
@@ -424,6 +438,7 @@ class _$AddDestinationImpl extends AddDestination {
     required TResult Function(
             String? type, double? minRating, double? maxDistance)
         filterNearbyPlaces,
+    required TResult Function(LatLng currentLocation) updateCurrentLocation,
   }) {
     return addDestination(point, name, description);
   }
@@ -441,6 +456,7 @@ class _$AddDestinationImpl extends AddDestination {
     TResult? Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult? Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult? Function(LatLng currentLocation)? updateCurrentLocation,
   }) {
     return addDestination?.call(point, name, description);
   }
@@ -458,6 +474,7 @@ class _$AddDestinationImpl extends AddDestination {
     TResult Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult Function(LatLng currentLocation)? updateCurrentLocation,
     required TResult orElse(),
   }) {
     if (addDestination != null) {
@@ -476,6 +493,8 @@ class _$AddDestinationImpl extends AddDestination {
     required TResult Function(RemoveDestination value) removeDestination,
     required TResult Function(ReorderDestinations value) reorderDestinations,
     required TResult Function(FilterNearbyPlaces value) filterNearbyPlaces,
+    required TResult Function(UpdateCurrentLocation value)
+        updateCurrentLocation,
   }) {
     return addDestination(this);
   }
@@ -490,6 +509,7 @@ class _$AddDestinationImpl extends AddDestination {
     TResult? Function(RemoveDestination value)? removeDestination,
     TResult? Function(ReorderDestinations value)? reorderDestinations,
     TResult? Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult? Function(UpdateCurrentLocation value)? updateCurrentLocation,
   }) {
     return addDestination?.call(this);
   }
@@ -504,6 +524,7 @@ class _$AddDestinationImpl extends AddDestination {
     TResult Function(RemoveDestination value)? removeDestination,
     TResult Function(ReorderDestinations value)? reorderDestinations,
     TResult Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult Function(UpdateCurrentLocation value)? updateCurrentLocation,
     required TResult orElse(),
   }) {
     if (addDestination != null) {
@@ -583,6 +604,7 @@ class _$ClearRouteImpl extends ClearRoute {
     required TResult Function(
             String? type, double? minRating, double? maxDistance)
         filterNearbyPlaces,
+    required TResult Function(LatLng currentLocation) updateCurrentLocation,
   }) {
     return clearRoute();
   }
@@ -600,6 +622,7 @@ class _$ClearRouteImpl extends ClearRoute {
     TResult? Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult? Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult? Function(LatLng currentLocation)? updateCurrentLocation,
   }) {
     return clearRoute?.call();
   }
@@ -617,6 +640,7 @@ class _$ClearRouteImpl extends ClearRoute {
     TResult Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult Function(LatLng currentLocation)? updateCurrentLocation,
     required TResult orElse(),
   }) {
     if (clearRoute != null) {
@@ -635,6 +659,8 @@ class _$ClearRouteImpl extends ClearRoute {
     required TResult Function(RemoveDestination value) removeDestination,
     required TResult Function(ReorderDestinations value) reorderDestinations,
     required TResult Function(FilterNearbyPlaces value) filterNearbyPlaces,
+    required TResult Function(UpdateCurrentLocation value)
+        updateCurrentLocation,
   }) {
     return clearRoute(this);
   }
@@ -649,6 +675,7 @@ class _$ClearRouteImpl extends ClearRoute {
     TResult? Function(RemoveDestination value)? removeDestination,
     TResult? Function(ReorderDestinations value)? reorderDestinations,
     TResult? Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult? Function(UpdateCurrentLocation value)? updateCurrentLocation,
   }) {
     return clearRoute?.call(this);
   }
@@ -663,6 +690,7 @@ class _$ClearRouteImpl extends ClearRoute {
     TResult Function(RemoveDestination value)? removeDestination,
     TResult Function(ReorderDestinations value)? reorderDestinations,
     TResult Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult Function(UpdateCurrentLocation value)? updateCurrentLocation,
     required TResult orElse(),
   }) {
     if (clearRoute != null) {
@@ -767,6 +795,7 @@ class _$UpdateDestinationImpl extends UpdateDestination {
     required TResult Function(
             String? type, double? minRating, double? maxDistance)
         filterNearbyPlaces,
+    required TResult Function(LatLng currentLocation) updateCurrentLocation,
   }) {
     return updateDestination(id, newLocation);
   }
@@ -784,6 +813,7 @@ class _$UpdateDestinationImpl extends UpdateDestination {
     TResult? Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult? Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult? Function(LatLng currentLocation)? updateCurrentLocation,
   }) {
     return updateDestination?.call(id, newLocation);
   }
@@ -801,6 +831,7 @@ class _$UpdateDestinationImpl extends UpdateDestination {
     TResult Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult Function(LatLng currentLocation)? updateCurrentLocation,
     required TResult orElse(),
   }) {
     if (updateDestination != null) {
@@ -819,6 +850,8 @@ class _$UpdateDestinationImpl extends UpdateDestination {
     required TResult Function(RemoveDestination value) removeDestination,
     required TResult Function(ReorderDestinations value) reorderDestinations,
     required TResult Function(FilterNearbyPlaces value) filterNearbyPlaces,
+    required TResult Function(UpdateCurrentLocation value)
+        updateCurrentLocation,
   }) {
     return updateDestination(this);
   }
@@ -833,6 +866,7 @@ class _$UpdateDestinationImpl extends UpdateDestination {
     TResult? Function(RemoveDestination value)? removeDestination,
     TResult? Function(ReorderDestinations value)? reorderDestinations,
     TResult? Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult? Function(UpdateCurrentLocation value)? updateCurrentLocation,
   }) {
     return updateDestination?.call(this);
   }
@@ -847,6 +881,7 @@ class _$UpdateDestinationImpl extends UpdateDestination {
     TResult Function(RemoveDestination value)? removeDestination,
     TResult Function(ReorderDestinations value)? reorderDestinations,
     TResult Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult Function(UpdateCurrentLocation value)? updateCurrentLocation,
     required TResult orElse(),
   }) {
     if (updateDestination != null) {
@@ -952,6 +987,7 @@ class _$RemoveDestinationImpl extends RemoveDestination {
     required TResult Function(
             String? type, double? minRating, double? maxDistance)
         filterNearbyPlaces,
+    required TResult Function(LatLng currentLocation) updateCurrentLocation,
   }) {
     return removeDestination(id);
   }
@@ -969,6 +1005,7 @@ class _$RemoveDestinationImpl extends RemoveDestination {
     TResult? Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult? Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult? Function(LatLng currentLocation)? updateCurrentLocation,
   }) {
     return removeDestination?.call(id);
   }
@@ -986,6 +1023,7 @@ class _$RemoveDestinationImpl extends RemoveDestination {
     TResult Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult Function(LatLng currentLocation)? updateCurrentLocation,
     required TResult orElse(),
   }) {
     if (removeDestination != null) {
@@ -1004,6 +1042,8 @@ class _$RemoveDestinationImpl extends RemoveDestination {
     required TResult Function(RemoveDestination value) removeDestination,
     required TResult Function(ReorderDestinations value) reorderDestinations,
     required TResult Function(FilterNearbyPlaces value) filterNearbyPlaces,
+    required TResult Function(UpdateCurrentLocation value)
+        updateCurrentLocation,
   }) {
     return removeDestination(this);
   }
@@ -1018,6 +1058,7 @@ class _$RemoveDestinationImpl extends RemoveDestination {
     TResult? Function(RemoveDestination value)? removeDestination,
     TResult? Function(ReorderDestinations value)? reorderDestinations,
     TResult? Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult? Function(UpdateCurrentLocation value)? updateCurrentLocation,
   }) {
     return removeDestination?.call(this);
   }
@@ -1032,6 +1073,7 @@ class _$RemoveDestinationImpl extends RemoveDestination {
     TResult Function(RemoveDestination value)? removeDestination,
     TResult Function(ReorderDestinations value)? reorderDestinations,
     TResult Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult Function(UpdateCurrentLocation value)? updateCurrentLocation,
     required TResult orElse(),
   }) {
     if (removeDestination != null) {
@@ -1147,6 +1189,7 @@ class _$ReorderDestinationsImpl extends ReorderDestinations {
     required TResult Function(
             String? type, double? minRating, double? maxDistance)
         filterNearbyPlaces,
+    required TResult Function(LatLng currentLocation) updateCurrentLocation,
   }) {
     return reorderDestinations(oldIndex, newIndex);
   }
@@ -1164,6 +1207,7 @@ class _$ReorderDestinationsImpl extends ReorderDestinations {
     TResult? Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult? Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult? Function(LatLng currentLocation)? updateCurrentLocation,
   }) {
     return reorderDestinations?.call(oldIndex, newIndex);
   }
@@ -1181,6 +1225,7 @@ class _$ReorderDestinationsImpl extends ReorderDestinations {
     TResult Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult Function(LatLng currentLocation)? updateCurrentLocation,
     required TResult orElse(),
   }) {
     if (reorderDestinations != null) {
@@ -1199,6 +1244,8 @@ class _$ReorderDestinationsImpl extends ReorderDestinations {
     required TResult Function(RemoveDestination value) removeDestination,
     required TResult Function(ReorderDestinations value) reorderDestinations,
     required TResult Function(FilterNearbyPlaces value) filterNearbyPlaces,
+    required TResult Function(UpdateCurrentLocation value)
+        updateCurrentLocation,
   }) {
     return reorderDestinations(this);
   }
@@ -1213,6 +1260,7 @@ class _$ReorderDestinationsImpl extends ReorderDestinations {
     TResult? Function(RemoveDestination value)? removeDestination,
     TResult? Function(ReorderDestinations value)? reorderDestinations,
     TResult? Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult? Function(UpdateCurrentLocation value)? updateCurrentLocation,
   }) {
     return reorderDestinations?.call(this);
   }
@@ -1227,6 +1275,7 @@ class _$ReorderDestinationsImpl extends ReorderDestinations {
     TResult Function(RemoveDestination value)? removeDestination,
     TResult Function(ReorderDestinations value)? reorderDestinations,
     TResult Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult Function(UpdateCurrentLocation value)? updateCurrentLocation,
     required TResult orElse(),
   }) {
     if (reorderDestinations != null) {
@@ -1351,6 +1400,7 @@ class _$FilterNearbyPlacesImpl extends FilterNearbyPlaces {
     required TResult Function(
             String? type, double? minRating, double? maxDistance)
         filterNearbyPlaces,
+    required TResult Function(LatLng currentLocation) updateCurrentLocation,
   }) {
     return filterNearbyPlaces(type, minRating, maxDistance);
   }
@@ -1368,6 +1418,7 @@ class _$FilterNearbyPlacesImpl extends FilterNearbyPlaces {
     TResult? Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult? Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult? Function(LatLng currentLocation)? updateCurrentLocation,
   }) {
     return filterNearbyPlaces?.call(type, minRating, maxDistance);
   }
@@ -1385,6 +1436,7 @@ class _$FilterNearbyPlacesImpl extends FilterNearbyPlaces {
     TResult Function(int oldIndex, int newIndex)? reorderDestinations,
     TResult Function(String? type, double? minRating, double? maxDistance)?
         filterNearbyPlaces,
+    TResult Function(LatLng currentLocation)? updateCurrentLocation,
     required TResult orElse(),
   }) {
     if (filterNearbyPlaces != null) {
@@ -1403,6 +1455,8 @@ class _$FilterNearbyPlacesImpl extends FilterNearbyPlaces {
     required TResult Function(RemoveDestination value) removeDestination,
     required TResult Function(ReorderDestinations value) reorderDestinations,
     required TResult Function(FilterNearbyPlaces value) filterNearbyPlaces,
+    required TResult Function(UpdateCurrentLocation value)
+        updateCurrentLocation,
   }) {
     return filterNearbyPlaces(this);
   }
@@ -1417,6 +1471,7 @@ class _$FilterNearbyPlacesImpl extends FilterNearbyPlaces {
     TResult? Function(RemoveDestination value)? removeDestination,
     TResult? Function(ReorderDestinations value)? reorderDestinations,
     TResult? Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult? Function(UpdateCurrentLocation value)? updateCurrentLocation,
   }) {
     return filterNearbyPlaces?.call(this);
   }
@@ -1431,6 +1486,7 @@ class _$FilterNearbyPlacesImpl extends FilterNearbyPlaces {
     TResult Function(RemoveDestination value)? removeDestination,
     TResult Function(ReorderDestinations value)? reorderDestinations,
     TResult Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult Function(UpdateCurrentLocation value)? updateCurrentLocation,
     required TResult orElse(),
   }) {
     if (filterNearbyPlaces != null) {
@@ -1456,4 +1512,196 @@ abstract class FilterNearbyPlaces extends TripPlannerEvent {
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$FilterNearbyPlacesImplCopyWith<_$FilterNearbyPlacesImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$UpdateCurrentLocationImplCopyWith<$Res> {
+  factory _$$UpdateCurrentLocationImplCopyWith(
+          _$UpdateCurrentLocationImpl value,
+          $Res Function(_$UpdateCurrentLocationImpl) then) =
+      __$$UpdateCurrentLocationImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({LatLng currentLocation});
+}
+
+/// @nodoc
+class __$$UpdateCurrentLocationImplCopyWithImpl<$Res>
+    extends _$TripPlannerEventCopyWithImpl<$Res, _$UpdateCurrentLocationImpl>
+    implements _$$UpdateCurrentLocationImplCopyWith<$Res> {
+  __$$UpdateCurrentLocationImplCopyWithImpl(_$UpdateCurrentLocationImpl _value,
+      $Res Function(_$UpdateCurrentLocationImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of TripPlannerEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? currentLocation = null,
+  }) {
+    return _then(_$UpdateCurrentLocationImpl(
+      null == currentLocation
+          ? _value.currentLocation
+          : currentLocation // ignore: cast_nullable_to_non_nullable
+              as LatLng,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$UpdateCurrentLocationImpl extends UpdateCurrentLocation {
+  const _$UpdateCurrentLocationImpl(this.currentLocation) : super._();
+
+  @override
+  final LatLng currentLocation;
+
+  @override
+  String toString() {
+    return 'TripPlannerEvent.updateCurrentLocation(currentLocation: $currentLocation)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UpdateCurrentLocationImpl &&
+            (identical(other.currentLocation, currentLocation) ||
+                other.currentLocation == currentLocation));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, currentLocation);
+
+  /// Create a copy of TripPlannerEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$UpdateCurrentLocationImplCopyWith<_$UpdateCurrentLocationImpl>
+      get copyWith => __$$UpdateCurrentLocationImplCopyWithImpl<
+          _$UpdateCurrentLocationImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(LatLng location, double radius, int maxRetries)
+        loadNearbyPlaces,
+    required TResult Function(LatLng point, String? name, String? description)
+        addDestination,
+    required TResult Function() clearRoute,
+    required TResult Function(String id, LatLng newLocation) updateDestination,
+    required TResult Function(String id) removeDestination,
+    required TResult Function(int oldIndex, int newIndex) reorderDestinations,
+    required TResult Function(
+            String? type, double? minRating, double? maxDistance)
+        filterNearbyPlaces,
+    required TResult Function(LatLng currentLocation) updateCurrentLocation,
+  }) {
+    return updateCurrentLocation(currentLocation);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(LatLng location, double radius, int maxRetries)?
+        loadNearbyPlaces,
+    TResult? Function(LatLng point, String? name, String? description)?
+        addDestination,
+    TResult? Function()? clearRoute,
+    TResult? Function(String id, LatLng newLocation)? updateDestination,
+    TResult? Function(String id)? removeDestination,
+    TResult? Function(int oldIndex, int newIndex)? reorderDestinations,
+    TResult? Function(String? type, double? minRating, double? maxDistance)?
+        filterNearbyPlaces,
+    TResult? Function(LatLng currentLocation)? updateCurrentLocation,
+  }) {
+    return updateCurrentLocation?.call(currentLocation);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(LatLng location, double radius, int maxRetries)?
+        loadNearbyPlaces,
+    TResult Function(LatLng point, String? name, String? description)?
+        addDestination,
+    TResult Function()? clearRoute,
+    TResult Function(String id, LatLng newLocation)? updateDestination,
+    TResult Function(String id)? removeDestination,
+    TResult Function(int oldIndex, int newIndex)? reorderDestinations,
+    TResult Function(String? type, double? minRating, double? maxDistance)?
+        filterNearbyPlaces,
+    TResult Function(LatLng currentLocation)? updateCurrentLocation,
+    required TResult orElse(),
+  }) {
+    if (updateCurrentLocation != null) {
+      return updateCurrentLocation(currentLocation);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(LoadNearbyPlaces value) loadNearbyPlaces,
+    required TResult Function(AddDestination value) addDestination,
+    required TResult Function(ClearRoute value) clearRoute,
+    required TResult Function(UpdateDestination value) updateDestination,
+    required TResult Function(RemoveDestination value) removeDestination,
+    required TResult Function(ReorderDestinations value) reorderDestinations,
+    required TResult Function(FilterNearbyPlaces value) filterNearbyPlaces,
+    required TResult Function(UpdateCurrentLocation value)
+        updateCurrentLocation,
+  }) {
+    return updateCurrentLocation(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(LoadNearbyPlaces value)? loadNearbyPlaces,
+    TResult? Function(AddDestination value)? addDestination,
+    TResult? Function(ClearRoute value)? clearRoute,
+    TResult? Function(UpdateDestination value)? updateDestination,
+    TResult? Function(RemoveDestination value)? removeDestination,
+    TResult? Function(ReorderDestinations value)? reorderDestinations,
+    TResult? Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult? Function(UpdateCurrentLocation value)? updateCurrentLocation,
+  }) {
+    return updateCurrentLocation?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(LoadNearbyPlaces value)? loadNearbyPlaces,
+    TResult Function(AddDestination value)? addDestination,
+    TResult Function(ClearRoute value)? clearRoute,
+    TResult Function(UpdateDestination value)? updateDestination,
+    TResult Function(RemoveDestination value)? removeDestination,
+    TResult Function(ReorderDestinations value)? reorderDestinations,
+    TResult Function(FilterNearbyPlaces value)? filterNearbyPlaces,
+    TResult Function(UpdateCurrentLocation value)? updateCurrentLocation,
+    required TResult orElse(),
+  }) {
+    if (updateCurrentLocation != null) {
+      return updateCurrentLocation(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class UpdateCurrentLocation extends TripPlannerEvent {
+  const factory UpdateCurrentLocation(final LatLng currentLocation) =
+      _$UpdateCurrentLocationImpl;
+  const UpdateCurrentLocation._() : super._();
+
+  LatLng get currentLocation;
+
+  /// Create a copy of TripPlannerEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$UpdateCurrentLocationImplCopyWith<_$UpdateCurrentLocationImpl>
+      get copyWith => throw _privateConstructorUsedError;
 }

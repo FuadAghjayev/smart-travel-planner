@@ -34,7 +34,7 @@ class TripPlannerState with _$TripPlannerState {
   int get selectedDestinationsCount => selectedDestinations.length;
 
   List<Destination> get filteredNearbyPlaces => nearbyPlaces.where((place) {
-    if (minRating > 0 && (place.rating ?? 0) < minRating) return false;
+    if (minRating > 0 && (place.rating) < minRating) return false;
     if (maxDistance < double.infinity) {
       final distance = double.tryParse(place.distance.replaceAll(' km', '')) ?? 0;
       if (distance > maxDistance) return false;

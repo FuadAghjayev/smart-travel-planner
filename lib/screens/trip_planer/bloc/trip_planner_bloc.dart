@@ -26,6 +26,7 @@ class TripPlannerBloc extends Bloc<TripPlannerEvent, TripPlannerState> {
         removeDestination: (RemoveDestination value) {  },
         reorderDestinations: (ReorderDestinations value) {  },
         filterNearbyPlaces: (FilterNearbyPlaces value) {  },
+        updateCurrentLocation: (UpdateCurrentLocation value) {  },
       );
     });
   }
@@ -69,7 +70,6 @@ class TripPlannerBloc extends Bloc<TripPlannerEvent, TripPlannerState> {
         error: null,
       ));
 
-      // Load nearby places for the new destination
       add(TripPlannerEvent.loadNearbyPlaces(
         location: event.point,
         radius: 1000,
@@ -94,30 +94,11 @@ class TripPlannerBloc extends Bloc<TripPlannerEvent, TripPlannerState> {
       error: null,
     ));
 
-    // Load nearby places for the last destination
     add(TripPlannerEvent.loadNearbyPlaces(
       location: destinations.last,
       radius: 1000,
     ));
   }
 
-  Future<List<Destination>> _retryLoadingPlaces(
-      LatLng location,
-      double radius,
-      int maxRetries,
-      ) async {
-    for (int i = 0; i < maxRetries; i++) {
-      try {
-        return await Destination.fetchNearbyPlaces(
-          location.latitude,
-          location.longitude,
-          radius: radius,
-        );
-      } catch (e) {
-        if (i == maxRetries - 1) rethrow;
-        await Future.delayed(const Duration(seconds: 1) * (i + 1));
-      }
-    }
-    return [];
-  }
+
 }
