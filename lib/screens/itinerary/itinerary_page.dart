@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../common/custom_app_bar.dart';
 import '../../constants/database/database.dart';
 import '../../constants/database/itinerary_repo.dart';
 import 'bloc/itinerary_bloc.dart';
@@ -100,8 +101,8 @@ class ItineraryView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Travel Itinerary'),
+      appBar: CustomAppBar(
+        title: 'Travel Itinerary',
         actions: [
           IconButton(
             icon: const Icon(Icons.add),

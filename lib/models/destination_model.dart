@@ -118,8 +118,6 @@ class Destination with _$Destination {
     }
   }
 
-  // Additional methods for TripPlanner integration
-
   String get displayName => '$name ($distance)';
 
   bool get hasValidCoordinates =>
