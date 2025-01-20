@@ -109,6 +109,7 @@ class ItineraryView extends StatelessWidget {
             onPressed: () => _addNewItem(context),
           ),
         ],
+        showBackButton: false,
       ),
       body: BlocConsumer<ItineraryBloc, ItineraryState>(
         listener: (context, state) {

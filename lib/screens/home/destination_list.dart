@@ -294,11 +294,11 @@ class _DestinationsListState extends State<DestinationsList> {
                   ),
                 if (widget.selectedDestinations.isNotEmpty)
                   Positioned(
-                    bottom: 16,
-                    right: 16,
+                    bottom: 10,
+                    left: 8,
                     child: MaterialButton(
                       onPressed: () => _saveToItinerary(context),
-                      color: Colors.blue,
+                      color: Colors.green,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),

@@ -1,10 +1,9 @@
+import 'package:advanced_salomon_bottom_bar/advanced_salomon_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import '../screens/home/home_page.dart';
 import '../screens/itinerary/itinerary_page.dart';
-import '../screens/place_details/place_details_page.dart';
 import '../screens/trip_planer/trip_planer_page.dart';
 import '../../models/place.dart';
 
@@ -47,7 +46,7 @@ class _ScaffoldWithBottomBarState extends State<ScaffoldWithBottomBar> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: widget.child,
-      bottomNavigationBar: SalomonBottomBar(
+      bottomNavigationBar: AdvancedSalomonBottomBar(
         currentIndex: _getCurrentIndex(widget.location),
         onTap: (index) {
           switch (index) {
@@ -63,17 +62,17 @@ class _ScaffoldWithBottomBarState extends State<ScaffoldWithBottomBar> {
           }
         },
         items: [
-          SalomonBottomBarItem(
+          AdvancedSalomonBottomBarItem(
             icon: const Icon(Icons.home),
             title: const Text('Home'),
             selectedColor: Colors.teal,
           ),
-          SalomonBottomBarItem(
+          AdvancedSalomonBottomBarItem(
             icon: const Icon(Icons.map),
             title: const Text('Trip Planner'),
             selectedColor: Colors.teal,
           ),
-          SalomonBottomBarItem(
+          AdvancedSalomonBottomBarItem(
             icon: const Icon(Icons.calendar_today),
             title: const Text('Itinerary program'),
             selectedColor: Colors.teal,
